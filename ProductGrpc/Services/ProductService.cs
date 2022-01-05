@@ -23,21 +23,20 @@ namespace ProductGrpc.Services
             _productDbContext = productDbContext ?? throw new ArgumentNullException(nameof(productDbContext));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }        
+        }
 
         public override Task<Empty> Test(Empty request, ServerCallContext context)
         {
             return base.Test(request, context);
         }
 
-        public override async Task<ProductModel> GetProduct(GetProductRequest request, 
-                                                                ServerCallContext context)
+        public override async Task<ProductModel> GetProduct(GetProductRequest request,
+            ServerCallContext context)
         {
             var product = await _productDbContext.Product.FindAsync(request.ProductId);
             if (product == null)
-            {
-                throw new RpcException(new Status(StatusCode.NotFound, $"Product with ID={request.ProductId} is not found."));
-            }
+                throw new RpcException(new Status(StatusCode.NotFound,
+                    $"Product with ID={request.ProductId} is not found."));
 
             //var productModel = new ProductModel
             //{
@@ -51,12 +50,12 @@ namespace ProductGrpc.Services
 
             var productModel = _mapper.Map<ProductModel>(product);
 
-            return productModel;                        
+            return productModel;
         }
 
-        public override async Task GetAllProducts(GetAllProductsRequest request, 
-                                                    IServerStreamWriter<ProductModel> responseStream, 
-                                                    ServerCallContext context)
+        public override async Task GetAllProducts(GetAllProductsRequest request,
+            IServerStreamWriter<ProductModel> responseStream,
+            ServerCallContext context)
         {
             var productList = await _productDbContext.Product.ToListAsync();
 
@@ -93,11 +92,10 @@ namespace ProductGrpc.Services
         {
             var product = _mapper.Map<Product>(request.Product);
 
-            bool isExist = await _productDbContext.Product.AnyAsync(p => p.ProductId == product.ProductId);
+            var isExist = await _productDbContext.Product.AnyAsync(p => p.ProductId == product.ProductId);
             if (!isExist)
-            {
-                throw new RpcException(new Status(StatusCode.NotFound, $"Product with ID={product.ProductId} is not found."));
-            }
+                throw new RpcException(new Status(StatusCode.NotFound,
+                    $"Product with ID={product.ProductId} is not found."));
 
             _productDbContext.Entry(product).State = EntityState.Modified;
 
@@ -114,13 +112,13 @@ namespace ProductGrpc.Services
             return productModel;
         }
 
-        public override async Task<DeleteProductResponse> DeleteProduct(DeleteProductRequest request, ServerCallContext context)
+        public override async Task<DeleteProductResponse> DeleteProduct(DeleteProductRequest request,
+            ServerCallContext context)
         {
             var product = await _productDbContext.Product.FindAsync(request.ProductId);
             if (product == null)
-            {
-                throw new RpcException(new Status(StatusCode.NotFound, $"Product with ID={request.ProductId} is not found."));
-            }
+                throw new RpcException(new Status(StatusCode.NotFound,
+                    $"Product with ID={request.ProductId} is not found."));
 
             _productDbContext.Product.Remove(product);
             var deleteCount = await _productDbContext.SaveChangesAsync();
@@ -133,7 +131,8 @@ namespace ProductGrpc.Services
             return response;
         }
 
-        public override async Task<InsertBulkProductResponse> InsertBulkProduct(IAsyncStreamReader<ProductModel> requestStream, ServerCallContext context)
+        public override async Task<InsertBulkProductResponse> InsertBulkProduct(
+            IAsyncStreamReader<ProductModel> requestStream, ServerCallContext context)
         {
             // https://csharp.hotexamples.com/examples/-/IAsyncStreamReader/-/php-iasyncstreamreader-class-examples.html
 
@@ -153,6 +152,5 @@ namespace ProductGrpc.Services
 
             return response;
         }
-
     }
 }

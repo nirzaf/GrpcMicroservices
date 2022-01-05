@@ -19,4 +19,3 @@ namespace ProductGrpc.Models
         NONE = 2
     }
 }
-

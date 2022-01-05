@@ -9,10 +9,11 @@ namespace ProductGrpc.Mapper
         public ProductProfile()
         {
             CreateMap<Models.Product, ProductModel>()
-                .ForMember(dest => dest.CreatedTime, opt => opt.MapFrom(src => Timestamp.FromDateTime(src.CreatedTime)));
+                .ForMember(dest => dest.CreatedTime,
+                    opt => opt.MapFrom(src => Timestamp.FromDateTime(src.CreatedTime)));
 
             CreateMap<ProductModel, Models.Product>()
-                .ForMember(dest => dest.CreatedTime, opt => opt.MapFrom(src => src.CreatedTime.ToDateTime()));                
+                .ForMember(dest => dest.CreatedTime, opt => opt.MapFrom(src => src.CreatedTime.ToDateTime()));
 
             // note : not use reverseMap. Timestamp should be converted manually.
         }
